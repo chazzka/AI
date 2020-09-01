@@ -73,7 +73,6 @@ migrace = 50
 
 # pocet behu
 for _ in range(10):
-
     # tvorba populace
     populace = []
     for i in range(pop_size):
@@ -91,10 +90,10 @@ for _ in range(10):
         leader = get_leader(populace)
 
         # leader je vzdy best dané migrace
-        # if DEFINE_UCELOVA_FUNKCE == 1:
-        #     best_results.append(first_dejong(leader.position))
-        # if DEFINE_UCELOVA_FUNKCE == 2:
-        #     best_results.append(schweffel(leader.position))
+        if DEFINE_UCELOVA_FUNKCE == 1:
+            best_results.append(first_dejong(leader.position))
+        if DEFINE_UCELOVA_FUNKCE == 2:
+            best_results.append(schweffel(leader.position))
 
         # posouvej ostatni k leaderovi pomocí Step
         for jedinec in populace:
@@ -130,21 +129,18 @@ for _ in range(10):
                         if DEFINE_UCELOVA_FUNKCE == 2:
                             if not -500 < sample < 500:
                                 potencial_position[index] = np.random.uniform(-500, 500)
-                    # aktualizuj
+                    # zjisti zda se vylepsil
                     if DEFINE_UCELOVA_FUNKCE == 1:
                         potencial_cost = first_dejong(potencial_position)
                     if DEFINE_UCELOVA_FUNKCE == 2:
                         potencial_cost = schweffel(potencial_position)
+                    # pokud ano, aktualizuj
                     if potencial_cost < best_cost:
                         best_cost = potencial_cost
                         best_position = potencial_position
                     t += step
                 # po dokončení whilu se vrátím tam kde to bylo nejlepsi
                 jedinec.position = best_position
-        print(best_cost)
-        best_results.append(best_cost)
     # ---konec migracniho kola---
-    # print(best_results)
-    # print("a")
     plt.plot(range(len(best_results)), best_results)
 plt.show()
