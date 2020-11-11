@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 """
 SOMA
@@ -93,19 +94,25 @@ def get_leader(population):
 
 
 # definice parametrů
+# chceme pohlídat 5000*d FEZů
+
 t = 0
 path_length = 3
 step = 0.33
 prt = 0.3
-d = 10 # v ukolu chce 10 a 30
+d = 10  # v ukolu chce 10 a 30
 pop_size = 3 * d
 migrace = 50
 pocet_behu = 30
+pocet_accepted_fezu = 5000 * d
 
 data_vsech_migraci = []
 plt.figure()
 # pocet behu
+
+konec = 0
 for _ in range(pocet_behu):
+    fezcounter = 0
     # tvorba populace
     populace = []
     for i in range(pop_size):
@@ -119,6 +126,7 @@ for _ in range(pocet_behu):
             populace.append(Jedinec(generate_random(d, -5.12, 5.12), 0))
 
     leader = get_leader(populace)
+    fezcounter += pop_size
     # pro graf
     best_results_migrace = []
     # migrace
@@ -132,6 +140,8 @@ for _ in range(pocet_behu):
         leader_of_population = leader
         # posouvej ostatni k leaderovi pomocí Step
         for jedinec in populace:
+            if konec == 1:
+                continue
             # než začne jedinec svou cestu, je vygenerovan nahodny vektor
             PRTVector = generate_random(d, 0, 1)
             #  - porovnej obsah vektoru s parametrem PRT
@@ -175,6 +185,13 @@ for _ in range(pocet_behu):
                         potencial_cost = second_dejong(potencial_position)
                     if DEFINE_UCELOVA_FUNKCE == 4:
                         potencial_cost = rastrigin(potencial_position)
+                    fezcounter += 1
+                    #print("fez counter je:")
+                    #print(fezcounter)
+                    if fezcounter > pocet_accepted_fezu:
+                        #print("fez counter je vesti, koncim")
+                        konec = 1
+                        break
                     # pokud ano, aktualizuj
                     if potencial_cost < actual_cost:
                         if potencial_cost < leader.cost:
@@ -190,20 +207,19 @@ for _ in range(pocet_behu):
     plt.plot(range(len(best_results_migrace)), best_results_migrace)
     plt.title('Vsechny behy')
 
-    #print(len(best_results_migrace))  # data posledniho behu, 50x
+    # print(len(best_results_migrace))  # data posledniho behu, 50x
     data_vsech_migraci.append(best_results_migrace)
 # ---konec jednoho behu---
 
 
 # pole polí - jeden prvek = data jednoho běhu
-#print(data_vsech)
+# print(data_vsech)
 
 pole_nejlepsich = []
 sectene_pole = [0] * migrace
 for migrace in data_vsech_migraci:
     sectene_pole = np.array(sectene_pole) + np.array(migrace)
     pole_nejlepsich.append(migrace[-1])
-
 
 print(np.sort(pole_nejlepsich))
 
@@ -213,12 +229,18 @@ print(np.min(pole_nejlepsich))
 print(np.mean(pole_nejlepsich))
 print(np.std(pole_nejlepsich))
 
-sectene_pole = sectene_pole/pocet_behu
-#print(sectene_pole)
+
+fig = go.Figure(data=[go.Table(header=dict(values=['Median', 'Max', 'Min', 'Mean', 'STADEV']),
+                 cells=dict(values=[[np.median(pole_nejlepsich)], [np.max(pole_nejlepsich)],[np.min(pole_nejlepsich)],[np.mean(pole_nejlepsich)],[np.std(pole_nejlepsich)]]))
+                     ])
+fig.show()
+
+
+sectene_pole = sectene_pole / pocet_behu
+print(sectene_pole)
 plt.subplot(212)
 plt.plot(range(len(sectene_pole)), sectene_pole)
 plt.title('prumery')
 plt.show()
 
-
-#TODO: statisticka tabulka a pohlidat fezy
+# TODO: statisticka tabulka a pohlidat fezy
