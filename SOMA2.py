@@ -135,8 +135,6 @@ def beh(dimenze, UCELOVKA):
         # migrace
         counterGlobal = 0
         for _ in range(migrace):
-            # ohodnot vsechny jedince v aktualni populaci (pozdeji ve foru) a ziskej leadera
-
             # leader je vzdy best dané migrace
             leader_of_population = leader
             # posouvej ostatni k leaderovi pomocí Step
@@ -205,24 +203,14 @@ def beh(dimenze, UCELOVKA):
             leader = leader_of_population
         # ---konec migracniho kola---
         plt.subplot(211)
-        # TODO, TADY SE TO MUSI LEPE NEJAK POCITAT
-        print("counter global" + str(counterGlobal))
-        print("best result migrace len:" + str(len(best_results_migrace)))
         plt.plot(range(0, counterGlobal), best_results_migrace)
         plt.title('Vsechny behy' + 'D=' + str(dimenze) + ' ucelovka' + str(UCELOVKA))
-        # print(len(best_results_migrace))  # data posledniho behu, 50x
         data_vsech_migraci.append(best_results_migrace)
     # ---konec jednoho behu---
 
-
-    # pole polí - jeden prvek = data jednoho běhu
-    # print(data_vsech)
-
     pole_nejlepsich = []
     sectene_pole = [0] * counterGlobal
-    # print("sectene pole:" + str(len(sectene_pole)))
     for data_migrace in data_vsech_migraci:
-        # print("migrace: " + str(len(data_migrace)))
         sectene_pole = np.array(sectene_pole) + np.array(data_migrace)
         pole_nejlepsich.append(data_migrace[-1])
 
@@ -297,25 +285,9 @@ workbook.close()
 
 #konec funkce
 
-# 1 - first dejong
-# 2 - schweffel
-# 3 - second dejong
-# 4 - rastrigin
-
-# beh(10, 1)
-#beh(10, 1)
-# beh(10, 3)
-# beh(10, 4)
-#
-# beh(30, 1)
-# beh(3, 2)
-# beh(30, 3)
-# beh(30, 4)
-
-# fig = go.Figure(data=[go.Table(header=dict(values=['Median', 'Max', 'Min', 'Mean', 'STADEV']),
-#                  cells=dict(values=[[np.median(pole_nejlepsich)], [np.max(pole_nejlepsich)],[np.min(pole_nejlepsich)],[np.mean(pole_nejlepsich)],[np.std(pole_nejlepsich)]]))
-#                      ])
-# fig.show()
+fig = go.Figure(data=[go.Table(header=dict(values=['Median', 'Max', 'Min', 'Mean', 'STADEV']),
+                  cells=dict(values=[[np.median(pole_nejlepsich)], [np.max(pole_nejlepsich)],[np.min(pole_nejlepsich)],[np.mean(pole_nejlepsich)],[np.std(pole_nejlepsich)]]))
+                      ])
+fig.show()
 
 plt.show()
-
