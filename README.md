@@ -1,2 +1,2 @@
 # AI
-Python repository for AI projects
+Repository for AI projects
