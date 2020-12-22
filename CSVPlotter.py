@@ -1,3 +1,15 @@
+import subprocess
+
+import sys
+
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'matplotlib'])
+subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'plotly'])
+
+reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
+installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
+
+print(installed_packages)
+
 import csv
 import matplotlib.pyplot as plt
 import plotly.graph_objects as go
@@ -7,6 +19,10 @@ import os, glob
 from tkinter import Tk
 from tkinter.filedialog import askdirectory
 from pathlib import Path
+
+import itertools
+import threading
+import time
 
 mediany = []
 maxy = []
@@ -18,10 +34,30 @@ nazvy_funkci = []
 polePrumeruVsechFilu = []
 poleIndexuGlobal = []
 
-
+# start - make user select folders
 Tk().withdraw()
 openPath = askdirectory(title='Select folder with csv files')
 savePath = askdirectory(title='Select where to save results')
+
+
+# long process - animate loading
+done = False
+
+
+def animate():
+    for c in itertools.cycle(['|', '/', '-', '\\']):
+        if done:
+            break
+        sys.stdout.write('\rgeneruji vysledky ' + c)
+        sys.stdout.flush()
+        time.sleep(0.1)
+    sys.stdout.write('\rJsem hotov!     ')
+
+
+t = threading.Thread(target=animate)
+t.start()
+
+
 folder_path = openPath
 for filename in glob.glob(os.path.join(folder_path, '*.csv')):
     with open(filename, newline='') as csvfile:
@@ -40,12 +76,11 @@ for filename in glob.glob(os.path.join(folder_path, '*.csv')):
         radekPrumeru.pop()
         tempRadek = np.array(radekPrumeru)
         ciselnyTempRadek = tempRadek.astype(np.float)
-        # print(ciselnyTempRadek)
         polePrumeru.append(sum(ciselnyTempRadek) / len(ciselnyTempRadek))
 
     polePrumeruVsechFilu.append(polePrumeru)
-
-    for i in range(0, 31):
+    pocetSloupcu = len(poleCSV[0])
+    for i in range(0, pocetSloupcu):
         poleSloupce = []
         for radek in poleCSV:
             ciselnaHodnota = float(radek[i])
@@ -68,7 +103,6 @@ for filename in glob.glob(os.path.join(folder_path, '*.csv')):
     plt.close()
 
     lastResults = []
-    # je jich 30
     for run in poleHodnotSloupcu:
         lastResults.append(run[len(run) - 1])
 
@@ -81,14 +115,12 @@ for filename in glob.glob(os.path.join(folder_path, '*.csv')):
 
     Path(savePath + "/imgresults/prumery").mkdir(parents=True, exist_ok=True)
     # toto je jedno csv:
-    # chceme graf 1x prumer
     plt.figure()
     plt.plot(poleIndexu, polePrumeru)
     plt.yscale('log')
     plt.title(name_of_file + 'prumer')
     plt.savefig(savePath + '/imgresults/prumery/' + name_of_file)
     plt.close()
-    # chceme graf se vsemi prumery jednotlivych dimenzi v jednom
 
 fig = go.Figure(data=[go.Table(header=dict(values=['Nazev funkce', 'Median', 'Max', 'Min', 'Mean', 'STADEV']),
                                cells=dict(values=[nazvy_funkci, mediany, maxy,
@@ -98,7 +130,6 @@ fig = go.Figure(data=[go.Table(header=dict(values=['Nazev funkce', 'Median', 'Ma
 
 Path(savePath + "/statresults").mkdir(parents=True, exist_ok=True)
 fig.write_html(savePath + "/statresults/statistika.html")
-# fig.show()
 
 plt.figure()
 for i in polePrumeruVsechFilu:
@@ -109,3 +140,5 @@ for i in polePrumeruVsechFilu:
     plt.savefig(savePath + '/imgresults/prumery/prumeryJedneDimenze')
 
 plt.close()
+
+done = True
