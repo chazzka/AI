@@ -26,7 +26,8 @@ class Jedinec:
 # minumum v 0
 def rastrigin(candidates):
     fitness = []
-    fit = 10 * len(candidates) + sum([(x ** 2 - 10 * np.cos(2 * np.pi * x)) for x in candidates])
+    fit = 10 * len(candidates) + \
+        sum([(x ** 2 - 10 * np.cos(2 * np.pi * x)) for x in candidates])
     fitness.append(fit)
     return fitness
 
@@ -105,7 +106,7 @@ def beh(dimenze, UCELOVKA):
     prt = 0.3
     d = dimenze  # v ukolu chce 10 a 30
     pop_size = 3 * d
-    pocet_behu = 30 #TODO: POZOR, TADY MÁ BÝT 30
+    pocet_behu = 30  # TODO: POZOR, TADY MÁ BÝT 30
     pocet_accepted_fezu = 5000 * d
     data_vsech_migraci = []
     plt.figure()
@@ -166,16 +167,20 @@ def beh(dimenze, UCELOVKA):
                         for index, sample in enumerate(potencial_position):
                             if UCELOVKA == 1:
                                 if not -5.12 < sample < 5.12:
-                                    potencial_position[index] = np.random.uniform(-5.12, 5.12)
+                                    potencial_position[index] = np.random.uniform(
+                                        -5.12, 5.12)
                             if UCELOVKA == 2:
                                 if not -500 < sample < 500:
-                                    potencial_position[index] = np.random.uniform(-500, 500)
+                                    potencial_position[index] = np.random.uniform(
+                                        -500, 500)
                             if UCELOVKA == 3:
                                 if not -5.12 < sample < 5.12:
-                                    potencial_position[index] = np.random.uniform(-5.12, 5.12)
+                                    potencial_position[index] = np.random.uniform(
+                                        -5.12, 5.12)
                             if UCELOVKA == 4:
                                 if not -5.12 < sample < 5.12:
-                                    potencial_position[index] = np.random.uniform(-5.12, 5.12)
+                                    potencial_position[index] = np.random.uniform(
+                                        -5.12, 5.12)
                         # zjisti zda se vylepsil
                         if UCELOVKA == 1:
                             potencial_cost = first_dejong(potencial_position)
@@ -204,7 +209,8 @@ def beh(dimenze, UCELOVKA):
         # ---konec migracniho kola---
         plt.subplot(211)
         plt.plot(range(0, counterGlobal), best_results_migrace)
-        plt.title('Vsechny behy' + 'D=' + str(dimenze) + ' ucelovka' + str(UCELOVKA))
+        plt.title('Vsechny behy' + 'D=' + str(dimenze) +
+                  ' ucelovka' + str(UCELOVKA))
         data_vsech_migraci.append(best_results_migrace)
     # ---konec jednoho behu---
 
@@ -218,9 +224,11 @@ def beh(dimenze, UCELOVKA):
     plt.subplot(212)
     plt.plot(range(counterGlobal), sectene_pole)
     plt.title('prumery')
-    plt.show(block=False)
+    # plt.show(block=False)
+    plt.savefig('prumery' + str(dimenze) + str(UCELOVKA))
 
     return pole_nejlepsich
+
 
 def printHeader(worksheet, dimenze, sloupec, radek):
 
@@ -236,7 +244,8 @@ def printHeader(worksheet, dimenze, sloupec, radek):
     sloupec = chr(ord(sloupec) + 1)
     worksheet.write(sloupec + str(radek), 'STR DEV')
 
-def printRadek(worksheet, pole_nejlepsich, nazev ,sloupec, radek):
+
+def printRadek(worksheet, pole_nejlepsich, nazev, sloupec, radek):
 
     worksheet.write(sloupec + str(radek), nazev)
     sloupec = chr(ord(sloupec) + 1)
@@ -251,8 +260,8 @@ def printRadek(worksheet, pole_nejlepsich, nazev ,sloupec, radek):
     worksheet.write(sloupec + str(radek), np.std(pole_nejlepsich))
 
 
-dimenze_pole = [10,30]
-ucelova_funkce_pole = [1,2,3,4]
+dimenze_pole = [10, 30]
+ucelova_funkce_pole = [1, 2, 3, 4]
 
 ucelovky = [
     'First dejong',
@@ -275,7 +284,8 @@ for dimenze in dimenze_pole:
 
         pole_nejlepsich = beh(dimenze, ucelova_funkce)
 
-        printRadek(worksheet, pole_nejlepsich, ucelovky[ucelova_funkce-1], prvni_sloupec, radek)
+        printRadek(worksheet, pole_nejlepsich,
+                   ucelovky[ucelova_funkce-1], prvni_sloupec, radek)
         radek += 1
 
     radek += 1
@@ -283,11 +293,7 @@ for dimenze in dimenze_pole:
 
 workbook.close()
 
-#konec funkce
+# konec funkce
 
-fig = go.Figure(data=[go.Table(header=dict(values=['Median', 'Max', 'Min', 'Mean', 'STADEV']),
-                  cells=dict(values=[[np.median(pole_nejlepsich)], [np.max(pole_nejlepsich)],[np.min(pole_nejlepsich)],[np.mean(pole_nejlepsich)],[np.std(pole_nejlepsich)]]))
-                      ])
-fig.show()
 
-plt.show()
+plt.close()
